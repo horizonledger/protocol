@@ -3,7 +3,17 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"time"
+
+	"github.com/gofrs/uuid"
 )
+
+type Msg struct {
+	Type   string    `json:"type"`
+	Value  string    `json:"value"`
+	Sender uuid.UUID `json:"uuid,omitempty"`
+	Time   time.Time `json:"time,omitempty"`
+}
 
 func parseMessageFromBytes(p []byte) Msg {
 

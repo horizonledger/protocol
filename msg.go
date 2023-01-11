@@ -1,4 +1,9 @@
-package main
+package protocol
+
+//https://gist.github.com/benjyz/97d904ff0fd5fab96d666db973be9e3d
+//https://stackoverflow.com/questions/29111777/is-it-possible-to-partially-decode-and-update-json-go
+//json.RawMessage
+//https://en.wikipedia.org/wiki/Multiple_dispatch
 
 import (
 	"encoding/json"
@@ -8,6 +13,15 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// generic message object which can hold messages and tx
+type Gen struct {
+	Type string `json:"type"`
+	// the value is a msg or tx struct
+	Value  json.RawMessage `json:"value,omitempty"`
+	Sender uuid.UUID       `json:"uuid,omitempty"`
+	Time   time.Time       `json:"time,omitempty"`
+}
+
 type Msg struct {
 	Type   string    `json:"type"`
 	Value  string    `json:"value"`
@@ -15,7 +29,12 @@ type Msg struct {
 	Time   time.Time `json:"time,omitempty"`
 }
 
-func parseMessageFromBytes(p []byte) Msg {
+//Amount   int    `json:"amount"`
+//Sender   string `json:"sender"`
+//Receiver string `json:"receiver"`
+//Nonce    int    `json:"nonce"`
+
+func ParseMessageFromBytes(p []byte) Msg {
 
 	msg := Msg{}
 	err := json.Unmarshal(p, &msg)
@@ -27,7 +46,7 @@ func parseMessageFromBytes(p []byte) Msg {
 	return msg
 }
 
-func parseMessageToBytes(msg Msg) []byte {
+func ParseMessageToBytes(msg Msg) []byte {
 
 	msgByte, err := json.Marshal(msg)
 	if err != nil {
@@ -38,4 +57,37 @@ func parseMessageToBytes(msg Msg) []byte {
 
 	return msgByte
 
+}
+
+func ParseGenToBytes(msg Gen) []byte {
+
+	msgByte, err := json.Marshal(msg)
+	if err != nil {
+		log.Println("couldnt parse message")
+	}
+
+	return msgByte
+
+}
+
+func ParseGenFromBytes(p []byte) Gen {
+
+	msg := Gen{}
+	err := json.Unmarshal(p, &msg)
+	if err != nil {
+		log.Println("couldnt parse message")
+	}
+	return msg
+}
+
+func MsgToGen(msg Msg) Gen {
+	jxmsg := ParseMessageToBytes(msg)
+	gen := Gen{Type: "Msg", Value: jxmsg}
+	return gen
+}
+
+func TxToGen(tx NameTx) Gen {
+	jxmsg := ParseTxToBytes(tx)
+	gen := Gen{Type: "NameTx", Value: jxmsg}
+	return gen
 }

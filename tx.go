@@ -2,7 +2,8 @@ package protocol
 
 import (
 	"encoding/json"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // uname-register
@@ -18,6 +19,7 @@ type NameTx struct {
 	SenderID     string `json:"senderID,omitempty"`
 	SenderPubkey string `json:"senderPubkey,omitempty"`
 	Signature    string `json:"signature,omitempty"`
+	//TODO
 	//Time time.Time `json:"time,omitempty"`
 }
 
@@ -25,7 +27,7 @@ func ParseTxToBytes(tx NameTx) []byte {
 
 	txByte, err := json.Marshal(tx)
 	if err != nil {
-		log.Println("couldnt parse message")
+		log.Warn("couldnt parse message ", tx)
 	}
 
 	return txByte
@@ -37,7 +39,7 @@ func ParseTxFromBytes(txb []byte) NameTx {
 	tx := NameTx{}
 	err := json.Unmarshal(txb, &tx)
 	if err != nil {
-		log.Println("couldnt parse message")
+		log.Warn("couldnt parse message", string(txb))
 	}
 	return tx
 

@@ -7,26 +7,27 @@ package protocol
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 
-	"github.com/gofrs/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 // generic message object which can hold messages and tx
 type Gen struct {
 	Type string `json:"type"`
 	// the value is a msg or tx struct
-	Value  json.RawMessage `json:"value,omitempty"`
-	Sender uuid.UUID       `json:"uuid,omitempty"`
-	Time   time.Time       `json:"time,omitempty"`
+	Value json.RawMessage `json:"value,omitempty"`
+	//Sender uuid.UUID       `json:"uuid,omitempty"`
+	Sender string    `json:"sender,omitempty"`
+	Time   time.Time `json:"time,omitempty"`
 }
 
 type Msg struct {
-	Type   string    `json:"type"`
-	Value  string    `json:"value"`
-	Sender uuid.UUID `json:"uuid,omitempty"`
-	Time   time.Time `json:"time,omitempty"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
+	//Sender uuid.UUID `json:"uuid,omitempty"`
+	Sender string    `json:"sender,omitempty"`
+	Time   time.Time `json:"time"`
 }
 
 //Amount   int    `json:"amount"`
@@ -39,7 +40,7 @@ func ParseMessageFromBytes(p []byte) Msg {
 	msg := Msg{}
 	err := json.Unmarshal(p, &msg)
 	if err != nil {
-		log.Println("couldnt parse message")
+		log.Error("couldnt ParseMessageFromBytes ", string(p))
 		// fmt.Printf("type: %s\n", msg.Type)
 		// fmt.Printf("value: %s\n", msg.Value)
 	}
@@ -50,7 +51,7 @@ func ParseMessageToBytes(msg Msg) []byte {
 
 	msgByte, err := json.Marshal(msg)
 	if err != nil {
-		log.Println("couldnt parse message")
+		log.Error("couldnt ParseMessageToBytes ", msg)
 		// fmt.Printf("type: %s\n", msg.Type)
 		// fmt.Printf("value: %s\n", msg.Value)
 	}
@@ -63,7 +64,7 @@ func ParseGenToBytes(msg Gen) []byte {
 
 	msgByte, err := json.Marshal(msg)
 	if err != nil {
-		log.Println("couldnt parse message")
+		log.Error("couldnt ParseGenToBytes ", msg)
 	}
 
 	return msgByte
@@ -75,7 +76,7 @@ func ParseGenFromBytes(p []byte) Gen {
 	msg := Gen{}
 	err := json.Unmarshal(p, &msg)
 	if err != nil {
-		log.Println("couldnt parse message")
+		log.Error("couldnt ParseGenFromBytes ", string(p))
 	}
 	return msg
 }
